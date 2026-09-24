@@ -165,7 +165,7 @@ const InterviewPrepPage = () => {
                   Total Questions
                 </label>
                 <div className="grid grid-cols-3 gap-3">
-                  {[3, 5, 10].map((num) => (
+                  {[5, 10, 15].map((num) => (
                     <button
                       key={num}
                       type="button"

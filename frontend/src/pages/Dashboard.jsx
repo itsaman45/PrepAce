@@ -1,28 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useAuth } from "../context/AuthContext";
-import { interviewApi } from "../services/interviewApi";
-import { Card, Button } from "../components/UI";
 import {
-  Sparkles,
-  Mic,
+  ArrowRight,
+  Briefcase,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
   FileSearch,
   FileUp,
-  UserCheck,
-  Play,
-  ArrowRight,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  TrendingUp,
-  Briefcase,
   Layers,
+  Loader2,
   LogOut,
-  ChevronRight,
-  ShieldCheck,
-  Loader2
+  Mic,
+  Play,
+  Sparkles,
+  UserCheck,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "../components/UI";
+import { useAuth } from "../context/AuthContext";
+import { interviewApi } from "../services/interviewApi";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -34,7 +31,11 @@ const Dashboard = () => {
   useEffect(() => {
     if (!user) {
       navigate("/login");
-    } else if (!user.targetRole || user.targetRole === "" || user.targetRole === "null") {
+    } else if (
+      !user.targetRole ||
+      user.targetRole === "" ||
+      user.targetRole === "null"
+    ) {
       navigate("/complete-profile");
     }
   }, [user, navigate]);
@@ -62,8 +63,12 @@ const Dashboard = () => {
   if (!user) return null;
 
   const totalSessions = sessions.length;
-  const completedSessions = sessions.filter((s) => s.status === "COMPLETED").length;
-  const inProgressSessions = sessions.filter((s) => s.status === "IN_PROGRESS").length;
+  const completedSessions = sessions.filter(
+    (s) => s.status === "COMPLETED",
+  ).length;
+  const inProgressSessions = sessions.filter(
+    (s) => s.status === "IN_PROGRESS",
+  ).length;
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 py-4">
@@ -86,10 +91,14 @@ const Dashboard = () => {
             )}
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-            Welcome, <span className="text-accent">{user.fullName || "Candidate"}</span>
+            Welcome,{" "}
+            <span className="text-accent">{user.fullName || "Candidate"}</span>
           </h1>
           <p className="text-text-secondary text-sm mt-1 font-dm">
-            Target Position: <strong className="text-white">{user.targetRole || "Software Engineer"}</strong>
+            Target Position:{" "}
+            <strong className="text-white">
+              {user.targetRole || "Software Engineer"}
+            </strong>
           </p>
         </div>
 
@@ -124,7 +133,9 @@ const Dashboard = () => {
             </div>
           </div>
           <div>
-            <p className="text-xl font-bold text-white truncate">{user.targetRole || "Not Configured"}</p>
+            <p className="text-xl font-bold text-white truncate">
+              {user.targetRole || "Not Configured"}
+            </p>
             <p className="text-xs text-text-secondary opacity-60 font-mono mt-1">
               Level: {user.experienceLevel || "Mid"}
             </p>
@@ -143,7 +154,7 @@ const Dashboard = () => {
           </div>
           <div>
             <p className="text-xl font-bold text-white truncate">
-              {user.resumeFilename ? "Indexed & Parsed" : "No Resume Uploaded"}
+              {user.resumeFilename ? "Indexed & Parsed" : "Resume Uploaded"}
             </p>
             <Link
               to="/analysis"
@@ -186,7 +197,9 @@ const Dashboard = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-              <p className="text-sm font-bold text-white font-mono">Speech-First Active</p>
+              <p className="text-sm font-bold text-white font-mono">
+                Speech-First Active
+              </p>
             </div>
             <p className="text-xs text-text-secondary opacity-60 font-mono mt-1">
               Single Groq LLM Turn Loop
@@ -217,12 +230,16 @@ const Dashboard = () => {
                 AI Voice Interview Room
               </h4>
               <p className="text-xs text-text-secondary leading-relaxed font-dm mb-6">
-                Start a live speech-first mock interview room tailored to your resume, projects, and target role concepts.
+                Start a live speech-first mock interview room tailored to your
+                resume, projects, and target role concepts.
               </p>
             </div>
             <div className="flex items-center justify-between pt-4 border-t border-white/5 text-accent text-xs font-bold font-mono">
               <span>START SESSION</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight
+                size={16}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </div>
           </div>
 
@@ -239,12 +256,16 @@ const Dashboard = () => {
                 Resume Intelligence Analysis
               </h4>
               <p className="text-xs text-text-secondary leading-relaxed font-dm mb-6">
-                Inspect extracted technical skills, project contributions, and candidate profile used by the AI engine.
+                Inspect extracted technical skills, project contributions, and
+                candidate profile used by the AI engine.
               </p>
             </div>
             <div className="flex items-center justify-between pt-4 border-t border-white/5 text-text-secondary group-hover:text-accent text-xs font-bold font-mono transition-colors">
               <span>VIEW ANALYSIS</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight
+                size={16}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </div>
           </div>
 
@@ -261,12 +282,16 @@ const Dashboard = () => {
                 Update Resume & Target Role
               </h4>
               <p className="text-xs text-text-secondary leading-relaxed font-dm mb-6">
-                Upload a new PDF resume or update your target position and experience level settings.
+                Upload a new PDF resume or update your target position and
+                experience level settings.
               </p>
             </div>
             <div className="flex items-center justify-between pt-4 border-t border-white/5 text-text-secondary group-hover:text-accent text-xs font-bold font-mono transition-colors">
               <span>UPDATE PROFILE</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight
+                size={16}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </div>
           </div>
         </div>
@@ -276,7 +301,9 @@ const Dashboard = () => {
       <div className="glass-card rounded-2xl p-6 md:p-8 border border-white/10">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white tracking-tight">Recent Interview Sessions</h3>
+            <h3 className="text-xl font-bold text-white tracking-tight">
+              Recent Interview Sessions
+            </h3>
             <p className="text-xs text-text-secondary opacity-70 font-mono mt-0.5">
               History of candidate mock sessions
             </p>
@@ -297,12 +324,21 @@ const Dashboard = () => {
           </div>
         ) : sessions.length === 0 ? (
           <div className="py-12 text-center border border-dashed border-white/10 rounded-xl p-8">
-            <Clock size={32} className="text-text-secondary mx-auto mb-3 opacity-40" />
-            <h4 className="text-base font-bold text-white mb-1">No Interview Sessions Yet</h4>
+            <Clock
+              size={32}
+              className="text-text-secondary mx-auto mb-3 opacity-40"
+            />
+            <h4 className="text-base font-bold text-white mb-1">
+              No Interview Sessions Yet
+            </h4>
             <p className="text-xs text-text-secondary max-w-sm mx-auto mb-6">
-              You haven't launched any AI mock interview sessions. Configure and start your first voice interview below!
+              You haven't launched any AI mock interview sessions. Configure and
+              start your first voice interview below!
             </p>
-            <Button onClick={() => navigate("/interview")} className="w-auto px-6 py-2.5 mx-auto text-xs">
+            <Button
+              onClick={() => navigate("/interview")}
+              className="w-auto px-6 py-2.5 mx-auto text-xs"
+            >
               START YOUR FIRST INTERVIEW
             </Button>
           </div>
@@ -321,7 +357,10 @@ const Dashboard = () => {
               </thead>
               <tbody className="divide-y divide-white/5 text-xs font-dm">
                 {sessions.map((sess) => (
-                  <tr key={sess.id} className="hover:bg-white/[0.02] transition-colors">
+                  <tr
+                    key={sess.id}
+                    className="hover:bg-white/[0.02] transition-colors"
+                  >
                     <td className="py-4 px-4 font-bold text-white">
                       {sess.targetRole}
                     </td>
@@ -332,7 +371,8 @@ const Dashboard = () => {
                       {sess.difficulty}
                     </td>
                     <td className="py-4 px-4 font-mono text-white">
-                      {sess.currentQuestionIndex} / {sess.totalQuestions} Questions
+                      {sess.currentQuestionIndex} / {sess.totalQuestions}{" "}
+                      Questions
                     </td>
                     <td className="py-4 px-4">
                       <span
@@ -340,11 +380,13 @@ const Dashboard = () => {
                           sess.status === "COMPLETED"
                             ? "bg-success/10 text-success border border-success/20"
                             : sess.status === "IN_PROGRESS"
-                            ? "bg-accent/10 text-accent border border-accent/20 animate-pulse"
-                            : "bg-white/5 text-text-secondary border border-white/10"
+                              ? "bg-accent/10 text-accent border border-accent/20 animate-pulse"
+                              : "bg-white/5 text-text-secondary border border-white/10"
                         }`}
                       >
-                        {sess.status === "COMPLETED" && <CheckCircle2 size={12} />}
+                        {sess.status === "COMPLETED" && (
+                          <CheckCircle2 size={12} />
+                        )}
                         {sess.status === "IN_PROGRESS" && <Clock size={12} />}
                         <span>{sess.status}</span>
                       </span>

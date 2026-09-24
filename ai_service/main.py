@@ -47,13 +47,24 @@ class Question(BaseModel):
     text: str
     hint: str
 
+import time
+
+class TelemetryData(BaseModel):
+    pdf_extraction_ms: float = 0.0
+    llm_analysis_ms: float = 0.0
+    total_ai_service_ms: float = 0.0
+    file_size_bytes: int = 0
+    character_count: int = 0
+
 class AnalysisResponse(BaseModel):
     projects: List[Project]
     skills: Skills
     questions: List[Question]
+    telemetry: Optional[TelemetryData] = None
 
 @app.post("/analyze", response_model=AnalysisResponse)
 async def analyze_resume(file: UploadFile = File(...), targetRole: str = "Software Engineer"):
+    overall_start = time.perf_counter()
     print(f"DEBUG: Received analysis request for role: {targetRole}, file: {file.filename}")
     
     if not file.filename.endswith('.pdf'):
@@ -61,15 +72,19 @@ async def analyze_resume(file: UploadFile = File(...), targetRole: str = "Softwa
 
     try:
         # 1. Extract text from PDF
+        pdf_extract_start = time.perf_counter()
         content = await file.read()
-        print(f"DEBUG: Read {len(content)} bytes from file")
+        file_size = len(content)
+        print(f"DEBUG: Read {file_size} bytes from file")
         
         pdf_reader = PyPDF2.PdfReader(io.BytesIO(content))
         text = ""
         for page in pdf_reader.pages:
             text += page.extract_text()
         
-        print(f"DEBUG: Extracted {len(text)} characters of text")
+        pdf_extract_end = time.perf_counter()
+        pdf_extract_ms = (pdf_extract_end - pdf_extract_start) * 1000.0
+        print(f"DEBUG: Extracted {len(text)} characters of text in {pdf_extract_ms:.2f} ms")
 
         # 2. Call Groq for analysis
         prompt = f"""
@@ -122,6 +137,7 @@ async def analyze_resume(file: UploadFile = File(...), targetRole: str = "Softwa
         """
 
         max_retries = 2
+        llm_start = time.perf_counter()
         for attempt in range(max_retries + 1):
             try:
                 print(f"DEBUG: Sending request to Groq (Attempt {attempt + 1})...")
@@ -136,8 +152,19 @@ async def analyze_resume(file: UploadFile = File(...), targetRole: str = "Softwa
                     ],
                     response_format={"type": "json_object"}
                 )
+                llm_end = time.perf_counter()
+                llm_ms = (llm_end - llm_start) * 1000.0
+                overall_ms = (llm_end - overall_start) * 1000.0
+                
                 analysis = json.loads(completion.choices[0].message.content)
-                print("DEBUG: Analysis successfully completed")
+                analysis["telemetry"] = {
+                    "pdf_extraction_ms": round(pdf_extract_ms, 2),
+                    "llm_analysis_ms": round(llm_ms, 2),
+                    "total_ai_service_ms": round(overall_ms, 2),
+                    "file_size_bytes": file_size,
+                    "character_count": len(text)
+                }
+                print(f"DEBUG: Analysis successfully completed in {overall_ms:.2f} ms")
                 return analysis
             except Exception as e:
                 error_msg = str(e)
@@ -265,15 +292,42 @@ async def generate_interview_questions(
 
     if itype == "HR":
         type_specific_guidance = """
-        ### HR Round Focus Guidelines:
-        - Generate questions that assess personality, communication, self-awareness, motivation, career goals, cultural fit, work ethic, adaptability, working under pressure, deadlines, failures, conflict with teammates, and feedback.
-        - For freshers/early career: Incorporate college projects, internships, group activities, academic choices, and learning experiences.
-        - For experienced candidates: Incorporate work history, career transitions, professional relationships, handling stress, and workplace ethics.
+        ### HR Round Focus Guidelines & Core Questions Bank:
+        You should draw from or tailor questions inspired by these 20 Core HR Questions and their evaluation goals:
+        1. Tell me about yourself. (Evaluates communication skills and ability to summarize background)
+        2. Why do you want to work for our company? (Assesses research and genuine interest in the organization)
+        3. Why are you leaving your current job? (Looks for professionalism and positive reasoning)
+        4. What are your greatest strengths? (Measures self-awareness and relevance to the role)
+        5. What is your biggest weakness? (Evaluates honesty, self-improvement, and accountability)
+        6. Where do you see yourself in 5 years? (Assesses career goals and alignment with the company)
+        7. Why should we hire you? (Tests ability to communicate unique value)
+        8. Describe a challenging situation at work and how you handled it. (Evaluates problem-solving and resilience)
+        9. Tell me about a time you worked in a team. (Assesses collaboration and interpersonal skills)
+        10. Tell me about a conflict with a coworker and how you resolved it. (Measures conflict resolution and emotional intelligence)
+        11. How do you handle pressure or tight deadlines? (Evaluates time management and stress management)
+        12. Describe a time you made a mistake. What did you learn? (Looks for accountability and continuous learning)
+        13. What motivates you? (Assesses whether your motivations fit the role)
+        14. How do you prioritize your work? (Evaluates organizational and planning skills)
+        15. Are you willing to relocate or travel? (Determines flexibility based on job requirements)
+        16. What are your salary expectations? (Assesses whether expectations align with the budget)
+        17. Tell me about an achievement you're proud of. (Evaluates impact, initiative, and results)
+        18. How do you handle feedback or criticism? (Measures adaptability and willingness to improve)
+        19. Do you have any questions for us? (Assesses curiosity and interest in the role)
+        20. Why should we not hire you? / What makes you different from other candidates? (Evaluates self-awareness, honesty, and confidence)
+
+        - For freshers/early career: Adapt these questions to incorporate college projects, internships, group activities, academic choices, and learning experiences.
+        - For experienced candidates: Adapt these questions to incorporate work history, career transitions, professional relationships, handling stress, and workplace ethics.
         - Focus on realistic behavioral and situational questions requiring specific actions and lessons learned.
         """
-        default_topic_seeds = ["Career Motivation & Role Alignment", "Teamwork & Conflict Resolution", "Adaptability & Pressure Handling", "Ownership & Work Ethic", "Personal Growth & Feedback"]
-        fallback_topic = "Career Motivation & Alignment"
-        fallback_text = f"Welcome to your HR round for the {request.candidateProfile.targetRole} role. To start, can you introduce yourself and explain what motivated you to apply for this role and how your background fits?"
+        default_topic_seeds = [
+            "Introduction & Background Summary",
+            "Company Fit & Career Motivation",
+            "Strengths, Weaknesses & Self-Awareness",
+            "Teamwork, Conflict & Problem Solving",
+            "Pressure, Prioritization & Growth"
+        ]
+        fallback_topic = "Introduction & Background Summary"
+        fallback_text = f"Welcome to your HR round for the {request.candidateProfile.targetRole} role. To start off, please tell me about yourself, summarizing your background and key experiences relevant to this position."
 
     elif itype == "MANAGERIAL":
         type_specific_guidance = """

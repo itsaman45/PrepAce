@@ -87,19 +87,65 @@ public class PlaceholderAiEngineClient implements AiEngineClient {
         String questionText;
 
         if (session.getInterviewType() == InterviewType.HR) {
-            switch (nextSeq) {
+            int index = (nextSeq - 1) % 20;
+            switch (index) {
+                case 1:
+                    questionText = "Why do you want to work for our company, and what specifically attracted you to this role?";
+                    break;
                 case 2:
-                    questionText = "What do you consider your greatest professional or personal strength, and what is one area or weakness you are actively working to improve?";
+                    questionText = "Why are you looking to leave your current job or transition from your recent project/studies?";
                     break;
                 case 3:
-                    questionText = "Can you describe a situation where you had a disagreement or conflict with a teammate or project partner? How did you handle it and what was the resolution?";
+                    questionText = "What are your greatest professional strengths, and how do they make you a great candidate for this role?";
                     break;
                 case 4:
-                    questionText = "Tell me about a time when you were under intense pressure or facing tight deadlines. How did you organize your work to ensure quality while managing stress?";
+                    questionText = "What is your biggest weakness, and what active steps are you taking to overcome or improve it?";
                     break;
                 case 5:
+                    questionText = String.format("Where do you see yourself in 5 years, and how does this position for %s align with your career goals?", session.getTargetRole());
+                    break;
+                case 6:
+                    questionText = "Why should we hire you over other qualified candidates applying for this role?";
+                    break;
+                case 7:
+                    questionText = "Describe a challenging situation or obstacle you faced at work/school and how you handled it.";
+                    break;
+                case 8:
+                    questionText = "Tell me about a time you worked in a team to deliver a project. What was your role and contribution?";
+                    break;
+                case 9:
+                    questionText = "Tell me about a conflict or disagreement you had with a coworker or team member. How did you resolve it?";
+                    break;
+                case 10:
+                    questionText = "How do you handle pressure, stress, or tight deadlines when workload builds up?";
+                    break;
+                case 11:
+                    questionText = "Describe a time you made a mistake at work or in a project. What happened and what did you learn from it?";
+                    break;
+                case 12:
+                    questionText = "What motivates you to perform at your best every day?";
+                    break;
+                case 13:
+                    questionText = "How do you prioritize your daily work and tasks when faced with multiple competing demands?";
+                    break;
+                case 14:
+                    questionText = "Are you open to relocating or traveling if the role requires it?";
+                    break;
+                case 15:
+                    questionText = "What are your salary expectations for this position based on your experience level?";
+                    break;
+                case 16:
+                    questionText = "Tell me about a major professional or personal achievement you are particularly proud of.";
+                    break;
+                case 17:
+                    questionText = "How do you handle constructive feedback or criticism from managers or peers?";
+                    break;
+                case 18:
+                    questionText = "Do you have any questions for us about the company, team, or role?";
+                    break;
+                case 19:
                 default:
-                    questionText = String.format("Where do you see yourself professionally in the next 2 to 3 years, and how does this role for %s fit into your long-term career aspirations?", session.getTargetRole());
+                    questionText = "What sets you apart from other candidates, or what is one reason someone might hesitate to hire you and how do you address it?";
                     break;
             }
         } else if (session.getInterviewType() == InterviewType.MANAGERIAL) {

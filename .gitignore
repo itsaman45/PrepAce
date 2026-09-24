@@ -1,0 +1,55 @@
+# Core
+.git
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.env
+!.env.example
+application.properties
+**/application.properties
+!application.properties.example
+!**/application.properties.example
+
+# IDEs & System Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.iml
+*.iws
+*.ipr
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & Temporary Files
+*.log
+backend/*.log
+*.tmp
+
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+build/
+.eslintcache
+.npm
+
+# Python / AI Service
+ai_service/venv/
+ai_service/__pycache__/
+**/__pycache__/
+**/*.pyc
+*.pyc
+.pytest_cache/
+*.venv/
+venv/
+
+# Java / Backend
+backend/target/
+backend/.mvn/
+backend/*.jar
+backend/*.war
+backend/uploads/
+uploads/
